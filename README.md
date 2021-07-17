@@ -93,5 +93,6 @@ Run UI tests:
 2. Run the test from `Product` ➞ `Test` or use `⌘U` shortcuts
 
 
-### Screen recording 
-![Screenshot](TodoListAppScreenRecording.gif)
+### Screen recording
+
+<img src="TodoListAppScreenRecording.gif" width="220"/>
