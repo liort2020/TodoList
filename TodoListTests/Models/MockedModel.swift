@@ -1,34 +1,47 @@
 //
-//  TodoWebModel+Mocked.swift
+//  MockedModel.swift
 //  TodoListTests
 //
-//  Created by Lior Tal on 09/07/2021.
+//  Created by Lior Tal on 16/07/2021.
+//  Copyright © 2021 Lior Tal. All rights reserved.
 //
 
 import XCTest
-import CoreData
 @testable import TodoList
 
-//extension TodoWebModel {
-class Mockiii {
-//    lazy var testBundle = Bundle(for: type(of: self))
-    static var testBundle = Bundle(for: Mockiii.self)
-    static let mockedFileName = "mock_todo_list"
+class MockedModel {
+    static var testBundle = Bundle(for: MockedModel.self)
+    static let mockedTodoListFileName = "mock_todo_list"
+    static let mockedTodoFileName = "mock_todo"
     
-    static func loadMockedModel(using context: NSManagedObjectContext) -> [Todo]? {
-        guard let url = testBundle.url(forResource: Self.mockedFileName, withExtension: "json") else {
-            return nil
-            
-        }
+    static func load() -> [TodoWebModel] {
+        guard let url = testBundle.url(forResource: Self.mockedTodoListFileName, withExtension: "json") else { return [] }
         
         do {
-//            let url = URL(fileURLWithPath: filePath)
             let data = try Data(contentsOf: url)
-            let todoWebModels = try JSONDecoder().decode([TodoWebModel].self, from: data)
-            let fff = todoWebModels.map {
-                $0.store(in: context)
-            }
-            return fff
+            return try JSONDecoder().decode([TodoWebModel].self, from: data)
+        } catch {
+            print("An error occurred while loading a mock model: \(error.localizedDescription)")
+            return []
+        }
+    }
+    
+    static func getTodoListData() -> Data? {
+        guard let url = testBundle.url(forResource: Self.mockedTodoListFileName, withExtension: "json") else { return nil }
+        
+        do {
+            return try Data(contentsOf: url)
+        } catch {
+            print("An error occurred while loading a mock model: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    static func todoData() -> Data? {
+        guard let url = testBundle.url(forResource: Self.mockedTodoFileName, withExtension: "json") else { return nil }
+
+        do {
+            return try Data(contentsOf: url)
         } catch {
             print("An error occurred while loading a mock model: \(error.localizedDescription)")
             return nil

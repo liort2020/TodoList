@@ -2,7 +2,7 @@
 //  MockedTodoInteractor.swift
 //  TodoListTests
 //
-//  Created by Lior Tal on 22/03/2021.
+//  Created by Lior Tal on 16/07/2021.
 //  Copyright © 2021 Lior Tal. All rights reserved.
 //
 
@@ -15,7 +15,6 @@ struct MockedTodoInteractor: Mock, TodoInteractor {
         case load
         case fetchAll
         case store(title: String)
-        case update(todo: Todo)
         case delete(todo: Todo)
     }
     var actions: MockedList<Action>
@@ -34,10 +33,6 @@ struct MockedTodoInteractor: Mock, TodoInteractor {
     
     func store(title: String, todoList: Binding<[Todo]>) {
         add(.store(title: title))
-    }
-    
-    func update(todo: Todo, todoList: Binding<[Todo]>) {
-        add(.update(todo: todo))
     }
     
     func delete(todo: Todo, todoList: Binding<[Todo]>) {

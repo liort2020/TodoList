@@ -1,62 +1,47 @@
 //
-//  ImageButtonUITests.swift
+//  TodoCellViewUITests.swift
 //  TodoListUITests
 //
-//  Created by Lior Tal on 13/07/2021.
+//  Created by Lior Tal on 16/07/2021.
+//  Copyright © 2021 Lior Tal. All rights reserved.
 //
 
 import XCTest
 @testable import TodoList
 
-final class ImageButtonUITests: XCTestCase {
+final class TodoCellViewUITests: XCTestCase {
     private var application: XCUIApplication?
+    private let deleteButtonTitle = "Delete"
     
-    // TODO: - remove this
-//    private let runningUITests = "IS_RUNNING_UITESTS"
+    private var todoCell: XCUIElement?
     
     override func setUp() {
         super.setUp()
         continueAfterFailure = false
         application = XCUIApplication()
-        
-        // TODO: - remove this
-//        application?.launchArguments.append(runningUITests)
-        
-        
         application?.launch()
+        
+        todoCell = application?.tables.firstMatch.cells.firstMatch
     }
     
-    func test_() throws {
-//        ImageButton(buttonTapped: <#T##Binding<Bool>#>, buttonIcon: <#T##String#>, buttonFont: <#T##Font#>)
+    func test_cell_exist() throws {
+        let todoCell = try XCTUnwrap(todoCell)
         
-        //        let alertTitleLabel = try XCTUnwrap(application).staticTexts[alertTitle]
-
+        XCTAssert(todoCell.exists)
+    }
+    
+    func test_swipe_to_delete() throws {
+        let todoCell = try XCTUnwrap(todoCell)
         
+        todoCell.swipeLeft()
+        let deleteButton = todoCell.buttons[deleteButtonTitle]
         
-        
-        XCTFail("TODO: - check if we have UI test to this button !!!!!!!!!!!!!!!!!!!!")
-        
-        XCTFail("TODO: - accessibility for all UI Tests")
-        
-        // TODO: - check if we have UI test to this button !!!!!!!!!!!!!!!!!!!!
-        
-        // TODO: - accessibility for all UI Tests
-        
-        
+        XCTAssert(deleteButton.exists)
     }
     
     override func tearDown() {
+        todoCell = nil
         application = nil
         super.tearDown()
     }
 }
-
-/*
- let textLabel = application?.staticTexts.element
- let textField = application?.textFields.element
- let buttons = application?.buttons.element
-
- print("🇺🇸 textLabel: \(textLabel)")
- print("🇺🇸 textField: \(textField)")
- print("🇺🇸 buttons: \(buttons)")
- */

@@ -2,7 +2,7 @@
 //  URLSession+Mocked.swift
 //  TodoListTests
 //
-//  Created by Lior Tal on 22/03/2021.
+//  Created by Lior Tal on 16/07/2021.
 //  Copyright © 2021 Lior Tal. All rights reserved.
 //
 
@@ -12,26 +12,16 @@ import XCTest
 extension URLSession {
     static var mockedSession: URLSession {
         let configuration: URLSessionConfiguration = .default
-        
-        
-        // TODO: - Add this !!!!!!!!!!
-//        configuration.protocolClasses = [RequestMocking.self, RequestBlocking.self]
-        
-        
-        configuration.protocolClasses = [URLProtocolMock.self]
-        
-        // TODO: - Add this !!!!!!!!!!
-//        configuration.timeoutIntervalForRequest = 1
-//        configuration.timeoutIntervalForResource = 1
-        
-        
+        configuration.protocolClasses = [MockURLProtocol.self]
         return URLSession(configuration: configuration)
     }
 }
 
-// MARK: - URLProtocolMock
-final class URLProtocolMock: URLProtocol {
-    static var testDictionary = [URL: Data]()
+// MARK: - MockURLProtocol
+final class MockURLProtocol: URLProtocol {
+    // Get request and return mock response
+    typealias MockRequest = ((URLRequest) throws -> (HTTPURLResponse, Data?))
+    static var requestHandler: MockRequest?
     
     // This method determines whether this protocol can handle the given request.
     override class func canInit(with request: URLRequest) -> Bool {
@@ -47,29 +37,26 @@ final class URLProtocolMock: URLProtocol {
     
     // Starts protocol-specific loading of a request.
     override func startLoading() {
-        if let url = request.url {
-            // Check if we have test data for the URL
-            guard let data = URLProtocolMock.testDictionary[url] else { return }
-            // Tells the client that the protocol implementation has loaded some data.
-            client?.urlProtocol(self, didLoad: data)
-        }
+        guard let requestHandler = Self.requestHandler, let client = client else { return }
         
-        // Tells the client that the protocol implementation has finished loading.
-        client?.urlProtocolDidFinishLoading(self)
+        do {
+            let (response, data) = try requestHandler(request)
+            
+            // Tells the client that the protocol implementation has created a response object for the request.
+            client.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            
+            if let data = data {
+                // Tells the client that the protocol implementation has loaded some data.
+                client.urlProtocol(self, didLoad: data)
+            }
+            
+            // Tells the client that the protocol implementation has finished loading.
+            client.urlProtocolDidFinishLoading(self)
+        } catch {
+            // Tells the client that the load request failed due to an error.
+            client.urlProtocol(self, didFailWithError: error)
+        }
     }
-    
-    
-    /*
-     override func startLoading() {
-         DispatchQueue(label: "").async {
-             self.client?.urlProtocol(self, didFailWithError: Error.requestBlocked)
-         }
-     }
-     */
-    
-    
-    
-    // TODO: - check if we need stopLoading() !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
     // Stops protocol-specific loading of a request.
     override func stopLoading() { }

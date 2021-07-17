@@ -2,7 +2,7 @@
 //  MockedBindingWithPublisher.swift
 //  TodoListTests
 //
-//  Created by Lior Tal on 22/03/2021.
+//  Created by Lior Tal on 16/07/2021.
 //  Copyright © 2021 Lior Tal. All rights reserved.
 //
 
@@ -12,8 +12,8 @@ import Combine
 @testable import TodoList
 
 struct MockedBindingWithPublisher<Value> {
-    private let binding: Binding<Value>
-    private let publisher: AnyPublisher<[Value], Never>
+    let binding: Binding<Value>
+    let publisher: AnyPublisher<[Value], Never>
     
     init(value: Value) {
         var value = value

@@ -1,8 +1,8 @@
 //
-//  RealTodoDBRepositoryTests.swift
+//  TodoDBRepositoryTests.swift
 //  TodoListTests
 //
-//  Created by Lior Tal on 22/03/2021.
+//  Created by Lior Tal on 16/07/2021.
 //  Copyright © 2021 Lior Tal. All rights reserved.
 //
 
@@ -11,7 +11,7 @@ import Combine
 import CoreData
 @testable import TodoList
 
-final class RealTodoDBRepositoryTests: XCTestCase {
+final class TodoDBRepositoryTests: XCTestCase {
     private var mockedPersistentStore = MockedPersistentStore()
     private var subscriptions = Set<AnyCancellable>()
     private static let expectationsTimeOut: TimeInterval = 5.0
@@ -32,7 +32,7 @@ final class RealTodoDBRepositoryTests: XCTestCase {
     
     func test_fetchTodoList() throws {
         let context = mockedPersistentStore.inMemoryContainer.viewContext
-        let todoWebModels = MockedModel.load(using: context)
+        let todoWebModels = MockedModel.load()
         
         // Given
         let fetchItemSnapshot = MockedPersistentStore.Snapshot(insertedObjects: 0, updatedObjects: 0, deletedObjects: 0)
@@ -66,7 +66,7 @@ final class RealTodoDBRepositoryTests: XCTestCase {
     
     func test_fetchTodo() throws {
         let context = mockedPersistentStore.inMemoryContainer.viewContext
-        guard let todoWebModel = MockedModel.load(using: context).first else {
+        guard let todoWebModel = MockedModel.load().first else {
             XCTFail("Unable to load item")
             return
         }
@@ -106,8 +106,7 @@ final class RealTodoDBRepositoryTests: XCTestCase {
     }
     
     func test_storeTodoList() throws {
-        let context = mockedPersistentStore.inMemoryContainer.viewContext
-        let todoWebModels = MockedModel.load(using: context)
+        let todoWebModels = MockedModel.load()
         
         // Given
         let updateOneItemSnapshot = MockedPersistentStore.Snapshot(insertedObjects: 1, updatedObjects: 0, deletedObjects: 0)
@@ -139,7 +138,7 @@ final class RealTodoDBRepositoryTests: XCTestCase {
     
     func test_deleteTodo() throws {
         let context = mockedPersistentStore.inMemoryContainer.viewContext
-        let todoWebModels = MockedModel.load(using: context)
+        let todoWebModels = MockedModel.load()
         
         // Given
         let deleteItemSnapshot = MockedPersistentStore.Snapshot(insertedObjects: 0, updatedObjects: 0, deletedObjects: 1)
@@ -191,6 +190,35 @@ final class RealTodoDBRepositoryTests: XCTestCase {
                 self.mockedPersistentStore.verify()
                 expectation.fulfill()
             }
+            .store(in: &subscriptions)
+        
+        waitForExpectations(timeout: Self.expectationsTimeOut)
+    }
+    
+    func test_deleteTodo_twice() throws {
+        let context = mockedPersistentStore.inMemoryContainer.viewContext
+        // Given
+        let todo = Todo(context: context)
+        todo.id = nil
+        
+        // We do not expect to receive actions
+        mockedPersistentStore.actions = MockedList(expectedActions: [])
+        
+        let expectation = expectation(description: "deleteTodoTwice")
+        
+        let testableObject = try XCTUnwrap(testableObject)
+        
+        // When
+        testableObject
+            .delete(todo: todo)
+            .sink { completion in
+                // Then
+                if let error = completion.checkError() {
+                    XCTFail("Unexpected error: \(error.localizedDescription)")
+                }
+                self.mockedPersistentStore.verify()
+                expectation.fulfill()
+            } receiveValue: { _ in }
             .store(in: &subscriptions)
         
         waitForExpectations(timeout: Self.expectationsTimeOut)

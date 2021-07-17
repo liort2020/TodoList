@@ -1,14 +1,15 @@
 //
-//  TextFieldAlertTests.swift
+//  TextFieldAlertUITests.swift
 //  TodoListUITests
 //
-//  Created by Lior Tal on 13/07/2021.
+//  Created by Lior Tal on 16/07/2021.
+//  Copyright © 2021 Lior Tal. All rights reserved.
 //
 
 import XCTest
 @testable import TodoList
 
-final class TextFieldAlertTests: XCTestCase {
+final class TextFieldAlertUITests: XCTestCase {
     private var application: XCUIApplication?
     private let navigationBarTitle = "Todo List"
     private let navigationBarButtonIcon = "add"
@@ -39,12 +40,40 @@ final class TextFieldAlertTests: XCTestCase {
         XCTAssert(alertTextLabel.exists, "Placeholder does not exist")
     }
     
-    func test_alert_buttons() throws {
-        let oKbutton = try XCTUnwrap(application).buttons[okButtonTitle]
-        let cancelbutton = try XCTUnwrap(application).buttons[cancelButtonTitle]
+    func test_ok_button() throws {
+        let okButton = try XCTUnwrap(application).buttons[okButtonTitle]
+        guard okButton.exists else {
+            XCTFail("OK button does not exist")
+            return
+        }
         
-        XCTAssert(oKbutton.exists, "OK button does not exist")
-        XCTAssert(cancelbutton.exists, "Cancel button does not exist")
+        okButton.tap()
+        XCTAssertFalse(okButton.exists, "When we tapped the ok button, the alert should be close")
+    }
+    
+    func test_cancel_button() throws {
+        let cancelButton = try XCTUnwrap(application).buttons[cancelButtonTitle]
+        guard cancelButton.exists else {
+            XCTFail("Cancel button does not exist")
+            return
+        }
+        
+        cancelButton.tap()
+        XCTAssertFalse(cancelButton.exists, "When we tapped the cancel button, the alert should be close")
+    }
+    
+    func test_input_title() throws {
+        let textField = try XCTUnwrap(application).textFields.element.firstMatch
+        guard textField.exists else {
+            XCTFail("Text field does not exist")
+            return
+        }
+        
+        let inputText = "New Title"
+        textField.typeText(inputText)
+        let textFieldValue = try XCTUnwrap(textField.value as? String)
+        
+        XCTAssertEqual(textFieldValue, inputText, "Expected value in the text field is: \(inputText) instead of: \(textFieldValue)")
     }
     
     override func tearDown() {

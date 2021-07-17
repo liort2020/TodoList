@@ -2,7 +2,7 @@
 //  MockedPersistentStore.swift
 //  TodoListTests
 //
-//  Created by Lior Tal on 22/03/2021.
+//  Created by Lior Tal on 16/07/2021.
 //  Copyright © 2021 Lior Tal. All rights reserved.
 //
 
@@ -34,26 +34,6 @@ final class MockedPersistentStore: Mock {
         return container
     }()
     
-    
-    
-    // TODO: - check this
-//    private func destroyAllDatabase() {
-//        inMemoryContainer.persistentStoreCoordinator.persistentStores.forEach { persistentStore in
-//            guard let persistentStoreUrl = persistentStore.url else { return }
-//
-//            do {
-//                try inMemoryContainer.persistentStoreCoordinator.destroyPersistentStore(at: persistentStoreUrl,
-//                                                                                        ofType: NSSQLiteStoreType,
-//                                                                                        options: nil)
-//            } catch let error {
-//                print("Unable to destroy persistent store: \(error.localizedDescription)")
-//            }
-//        }
-//    }
-//
-//    deinit {
-//        destroyAllDatabase()
-//    }
 }
 
 extension MockedPersistentStore: PersistentStore {
@@ -115,23 +95,6 @@ extension MockedPersistentStore: PersistentStore {
             context.reset()
             return Fail<Void, Error>(error: error).publish()
         }
-        
-        
-//        do {
-//            let context = inMemoryContainer.viewContext
-//            context.reset()
-//            let itemsToDelete = try context.fetch(fetchRequest)
-//            itemsToDelete.forEach {
-//                context.delete($0)
-//                try context.save()
-//                add(.delete(context.snapshot))
-//            }
-//            return Future<Void, Error> { promise in
-//                promise(.success(()))
-//            }.publish()
-//        } catch let error {
-//            return Fail<Void, Error>(error: error).publish()
-//        }
     }
 }
 

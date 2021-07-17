@@ -2,7 +2,7 @@
 //  MockedTodoWebRepository.swift
 //  TodoListTests
 //
-//  Created by Lior Tal on 22/03/2021.
+//  Created by Lior Tal on 16/07/2021.
 //  Copyright © 2021 Lior Tal. All rights reserved.
 //
 
@@ -13,7 +13,6 @@ import Combine
 final class MockedTodoWebRepository: TestWebRepository, Mock, TodoWebRepository {
     enum Action: Equatable {
         case getAll
-        case update(todo: Todo)
         case store(title: String)
         case delete(todo: Todo)
     }
@@ -27,11 +26,6 @@ final class MockedTodoWebRepository: TestWebRepository, Mock, TodoWebRepository 
     func getAll() -> AnyPublisher<[TodoWebModel], Error> {
         add(.getAll)
         return getAllResponse.publish()
-    }
-    
-    func update(todo: Todo) -> AnyPublisher<TodoWebModel, Error> {
-        add(.update(todo: todo))
-        return updateResponse.publish()
     }
     
     func store(title: String) -> AnyPublisher<TodoWebModel, Error> {
